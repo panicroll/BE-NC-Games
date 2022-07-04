@@ -2,7 +2,7 @@
 
 ## Environment Setup
 
-To connect to the database locally create two files in the project root directory: `.env.development` and `.env.test`.
+To connect to the databases locally create two files in the project root directory: `.env.development` and `.env.test`.
 
 Within .env.development add:
 ```
