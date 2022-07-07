@@ -186,7 +186,6 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(message).toBe("Review not found");
       });
   });
-});
 
 // GET /api/users
 
