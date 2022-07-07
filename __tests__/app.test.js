@@ -107,7 +107,7 @@ describe("PATCH /api/reviews/:review_id", () => {
             review_body: expect.any(String),
             designer: expect.any(String),
             review_img_url: expect.any(String),
-            votes: expect.any(Number),
+            votes: 2,
             category: expect.any(String),
             owner: expect.any(String),
             created_at: expect.any(String),
@@ -135,12 +135,34 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(message).toBe("Bad request");
       });
   });
+  test("status: 400, responds with bad request when passed an invalid review ID", () => {
+    return request(app)
+      .patch("/api/reviews/banana")
+      .send({ inc_votes: 5 })
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
+      });
+  });
   test("status: 404, responds with review not found when trying to update a review that doesn't exist", () => {
     return request(app)
       .patch("/api/reviews/3000")
       .send({ inc_votes: 10 })
       .expect(404)
       .then(({ body }) => {
+        console.log(body);
+        const { message } = body;
+        expect(message).toBe("Review not found");
+      });
+  });
+  test("status: 404, responds with review not found when trying to update a review with a valid but non-existent ID", () => {
+    return request(app)
+      .patch("/api/reviews/303430943")
+      .send({ inc_votes: 25 })
+      .expect(404)
+      .then(({ body }) => {
+        console.log(body);
         const { message } = body;
         expect(message).toBe("Review not found");
       });
