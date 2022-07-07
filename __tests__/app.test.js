@@ -141,9 +141,41 @@ describe("PATCH /api/reviews/:review_id", () => {
       .send({ inc_votes: 10 })
       .expect(404)
       .then(({ body }) => {
-        console.log(body);
         const { message } = body;
         expect(message).toBe("Review not found");
+      });
+  });
+});
+
+// GET /api/users
+
+describe("GET /api/users", () => {
+  test("status: 200, responds with an array of user objects each containing the appropriate properties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toBeInstanceOf(Array);
+        expect(users).toHaveLength(4);
+
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+  test("status: 404, responds with not found when passed an incorrect path", () => {
+    return request(app)
+      .get("/api/user")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Not found");
       });
   });
 });
