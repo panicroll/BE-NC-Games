@@ -1,9 +1,9 @@
 const express = require("express");
-const {
-  getCategories,
-  getReview,
-  patchReview,
-} = require("./controllers/controller");
+const getCategories = require("./controllers/getCategories");
+const getReview = require("./controllers/getReview");
+const patchReview = require("./controllers/patchReview");
+const getUsers = require("./controllers/getUsers");
+
 const {
   handleNotFound,
   handleCustomErrors,
@@ -14,11 +14,19 @@ const {
 const app = express();
 app.use(express.json());
 
+// GET requests
+
 app.get("/api/categories", getCategories);
 
 app.get("/api/reviews/:review_id", getReview);
 
+app.get("/api/users", getUsers);
+
+// PATCH requests
+
 app.patch("/api/reviews/:review_id", patchReview);
+
+// Error handling
 
 app.all("*", handleNotFound);
 
