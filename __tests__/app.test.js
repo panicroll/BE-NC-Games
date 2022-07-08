@@ -34,6 +34,7 @@ describe("GET /api/categories", () => {
         });
       });
   });
+
   test("status: 404, responds with not found when passed a non-existent path", () => {
     return request(app)
       .get("/api/categ")
@@ -70,6 +71,7 @@ describe("GET /api/reviews/:review_id", () => {
         );
       });
   });
+
   test("status: 400, responds with bad request when passed an ID with invalid syntax", () => {
     return request(app)
       .get("/api/reviews/one")
@@ -79,6 +81,7 @@ describe("GET /api/reviews/:review_id", () => {
         expect(message).toBe("Bad request");
       });
   });
+
   test("status: 404, responds with review not found when passed a valid ID that is currently unused", () => {
     return request(app)
       .get("/api/reviews/3000")
@@ -116,6 +119,7 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(body.review.votes).toBe(2);
       });
   });
+
   test("status: 200, accepts an object to decrease votes on a review and responds with the updated review", () => {
     return request(app)
       .patch("/api/reviews/2")
@@ -125,6 +129,18 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(body.review.votes).toBe(3);
       });
   });
+
+  test("status: 400, responds with bad request when passed an empty object", () => {
+    return request(app)
+      .patch("/api/reviews/1")
+      .send({ })
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("No votes input provided");
+      });
+  });
+
   test("status: 400, responds with bad request when passed a non-numeric vote increment", () => {
     return request(app)
       .patch("/api/reviews/2")
@@ -135,6 +151,7 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(message).toBe("Bad request");
       });
   });
+
   test("status: 400, responds with bad request when passed an invalid review ID", () => {
     return request(app)
       .patch("/api/reviews/banana")
@@ -145,6 +162,7 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(message).toBe("Bad request");
       });
   });
+
   test("status: 404, responds with review not found when trying to update a review that doesn't exist", () => {
     return request(app)
       .patch("/api/reviews/3000")
@@ -156,6 +174,7 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(message).toBe("Review not found");
       });
   });
+
   test("status: 404, responds with review not found when trying to update a review with a valid but non-existent ID", () => {
     return request(app)
       .patch("/api/reviews/303430943")
@@ -167,7 +186,6 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(message).toBe("Review not found");
       });
   });
-});
 
 // GET /api/users
 
@@ -192,6 +210,7 @@ describe("GET /api/users", () => {
         });
       });
   });
+
   test("status: 404, responds with not found when passed an incorrect path", () => {
     return request(app)
       .get("/api/user")
