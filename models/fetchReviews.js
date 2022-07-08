@@ -8,7 +8,6 @@ const fetchReviews = () => {
     GROUP BY reviews.review_id ORDER BY created_at desc;`
     )
     .then(({ rows }) => {
-        console.log(rows)
       return rows;
     });
 };
