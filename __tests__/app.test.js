@@ -3,7 +3,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data");
 const seed = require("../db/seeds/seed");
-const sorted = require('jest-sorted');
+const sorted = require("jest-sorted");
 
 beforeEach(() => {
   return seed(testData);
@@ -88,7 +88,6 @@ describe("GET /api/reviews/:review_id", () => {
       .get("/api/reviews/3000")
       .expect(404)
       .then(({ body }) => {
-        console.log(body);
         const { message } = body;
         expect(message).toBe("Review not found");
       });
@@ -159,7 +158,6 @@ describe("PATCH /api/reviews/:review_id", () => {
       .send({ inc_votes: 10 })
       .expect(404)
       .then(({ body }) => {
-        console.log(body);
         const { message } = body;
         expect(message).toBe("Review not found");
       });
@@ -171,7 +169,6 @@ describe("PATCH /api/reviews/:review_id", () => {
       .send({ inc_votes: 25 })
       .expect(404)
       .then(({ body }) => {
-        console.log(body);
         const { message } = body;
         expect(message).toBe("Review not found");
       });
@@ -271,14 +268,14 @@ describe("GET /api/reviews", () => {
       });
   });
 
-  test('status:200, responds with array of review objects sorted by date in descending order', () => {
+  test("status:200, responds with array of review objects sorted by date in descending order", () => {
     return request(app)
-      .get('/api/reviews')
+      .get("/api/reviews")
       .expect(200)
       .then(({ body }) => {
         const { reviews } = body;
-        expect(reviews).toBeSortedBy("created_at", {descending: true})
-      })
+        expect(reviews).toBeSortedBy("created_at", { descending: true });
+      });
   });
 
   test("status: 404, responds with not found when passed a non-existent path", () => {
@@ -295,23 +292,56 @@ describe("GET /api/reviews", () => {
 
 describe("GET /api/reviews/:review_id/comments", () => {
   test("status: 200, responds with an array of comments for the given review", () => {
-    return request(app).get("/api/reviews/2/comments").expect(200).then(({body}) => {
-      const {comments} = body;
-      expect(comments).toBeInstanceOf(Array);
-      expect(comments).toHaveLength(3);
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toBeInstanceOf(Array);
+        expect(comments).toHaveLength(3);
 
-      comments.forEach((comment) => {
-        expect(comment).toEqual(
-          expect.objectContaining({
-            comment_id: expect.any(String),
-            votes: expect.any(Number),
-            created_at: expect.any(String),
-            author: expect.any(String),
-            body: expect.any(String),
-            review_id: expect.any(Number),
-          })
-        );
+        comments.forEach((comment) => {
+          expect(comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              review_id: expect.any(Number),
+            })
+          );
+        });
       });
-    })
-  })
-})
+  });
+
+  test("status: 400, responds with bad request when passed an ID with invalid syntax", () => {
+    return request(app)
+      .get("/api/reviews/one/comments")
+      .expect(400)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Bad request");
+      });
+  });
+
+  test("status: 404, responds with review not found when passed a valid ID that is currently unused", () => {
+    return request(app)
+      .get("/api/reviews/9000/comments")
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("Review not found");
+      });
+  });
+
+  test("status: 404, responds with no comments found when a valid review has no available comments", () => {
+    return request(app)
+      .get("/api/reviews/4/comments")
+      .expect(404)
+      .then(({ body }) => {
+        const { message } = body;
+        expect(message).toBe("No comments found");
+      });
+  });
+});
