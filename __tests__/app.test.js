@@ -290,3 +290,28 @@ describe("GET /api/reviews", () => {
       });
   });
 });
+
+// GET /api/reviews/:review_id/comments
+
+describe("GET /api/reviews/:review_id/comments", () => {
+  test("status: 200, responds with an array of comments for the given review", () => {
+    return request(app).get("/api/reviews/2/comments").expect(200).then(({body}) => {
+      const {comments} = body;
+      expect(comments).toBeInstanceOf(Array);
+      expect(comments).toHaveLength(3);
+
+      comments.forEach((comment) => {
+        expect(comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(String),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            review_id: expect.any(Number),
+          })
+        );
+      });
+    })
+  })
+})

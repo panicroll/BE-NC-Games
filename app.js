@@ -4,6 +4,7 @@ const getReview = require("./controllers/getReview");
 const patchReview = require("./controllers/patchReview");
 const getUsers = require("./controllers/getUsers");
 const getReviews = require("./controllers/getReviews")
+const getCommentsByReviewId = require("./controllers/getCommentsByReviewId")
 
 const {
   handleNotFound,
@@ -24,6 +25,8 @@ app.get("/api/reviews/:review_id", getReview);
 app.get("/api/users", getUsers);
 
 app.get("/api/reviews", getReviews);
+
+app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
 
 // PATCH requests
 
