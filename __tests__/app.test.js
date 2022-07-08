@@ -3,6 +3,7 @@ const app = require("../app");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data");
 const seed = require("../db/seeds/seed");
+const sorted = require('jest-sorted');
 
 beforeEach(() => {
   return seed(testData);
@@ -130,17 +131,6 @@ describe("PATCH /api/reviews/:review_id", () => {
       });
   });
 
-  test("status: 400, responds with bad request when passed an empty object", () => {
-    return request(app)
-      .patch("/api/reviews/1")
-      .send({ })
-      .expect(400)
-      .then(({ body }) => {
-        const { message } = body;
-        expect(message).toBe("No votes input provided");
-      });
-  });
-
   test("status: 400, responds with bad request when passed a non-numeric vote increment", () => {
     return request(app)
       .patch("/api/reviews/2")
@@ -186,6 +176,7 @@ describe("PATCH /api/reviews/:review_id", () => {
         expect(message).toBe("Review not found");
       });
   });
+});
 
 // GET /api/users
 
@@ -247,5 +238,55 @@ describe("GET /api/reviews/:review_id with comment_count", () => {
           })
         );
       });
-  })
-})
+  });
+});
+
+// GET /API/REVIEWS
+
+describe("GET /api/reviews", () => {
+  test("status: 200, responds with an array of review objects", () => {
+    return request(app)
+      .get("/api/reviews")
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeInstanceOf(Array);
+        expect(reviews).toHaveLength(13);
+
+        reviews.forEach((review) => {
+          expect(review).toEqual(
+            expect.objectContaining({
+              owner: expect.any(String),
+              title: expect.any(String),
+              review_id: expect.any(Number),
+              category: expect.any(String),
+              review_img_url: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              designer: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+
+  test('status:200, responds with array of review objects sorted by date in descending order', () => {
+    return request(app)
+      .get('/api/reviews')
+      .expect(200)
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("created_at", {descending: true})
+      })
+  });
+
+  test("status: 404, responds with not found when passed a non-existent path", () => {
+    return request(app)
+      .get("/api/rev")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Not found");
+      });
+  });
+});
